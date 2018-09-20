@@ -1,0 +1,52 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(90deg, #6b478a, #e99aca);
+  margin: 0; padding: 0;
+  text-align: center;
+}
+.mainFrame {
+  display: inline-block;
+  border-radius: 10px;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgb(255,255,255, 0.6);
+}
+.mainFrame > * {
+  margin: 5px auto;
+  vertical-align: middle;
+}
+.mainFrame__btns {
+  display: inline-block;
+}
+.mainFrame__btns button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+}
+.mainFrame__btns button::-moz-focus-inner {
+  border: 0;
+}
+input {
+  width: 30px;
+  text-align: center;
+  background: transparent;
+  border: 1px solid #000;
+}
+table {
+  border-collapse: collapse;
+  margin: 20px auto;
+  background: rgb(255,255,255, 0.6);
+}
+td, th {
+  border: 1px solid #000;
+  padding: 8px;
+}
+th {
+  color: #c62570;
+  background: rgb(255,255,255, 0.2);
+}
+@media only screen and (max-width: 768px) {
+  textarea {
+    display: block;
+  }
+}
