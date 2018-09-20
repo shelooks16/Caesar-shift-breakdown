@@ -1,6 +1,6 @@
-const [input, output] = document.querySelectorAll('textarea');
-const [dBtn, cBtn] = document.querySelectorAll('button');
-const shiftField = document.getElementById('shift');
+const [inputEn, outputEn, inputDe, outputDe] = document.querySelectorAll('textarea');
+const [eBtn, ecBtn, dBtn, dcBtn] = document.querySelectorAll('button');
+const [keyInput, shiftField] = document.querySelectorAll('input');
 
 const delTable = ()=>{
 	if( document.querySelector('table') ) {
@@ -8,19 +8,44 @@ const delTable = ()=>{
 	}
 };
 
+const validate = ev => {
+	const event = ev || window.event;
+	let key = String.fromCharCode( event.which );
+  if( !key.match(/[0-9\-\b]/) ) {
+    event.returnValue = false;
+    if(event.preventDefault) event.preventDefault();
+  }
+}
+
+// encryption
+eBtn.onclick = function() {
+	const plainText = inputEn.value;
+	const key = keyInput.value;
+	if(!plainText || !key) return;
+	const encryptedText = decrypt( plainText, key, 1 );
+	outputEn.value = encryptedText;
+}
+
+ecBtn.onclick = function() {
+	outputEn.value = "";
+	inputEn.value = "";
+	keyInput.value = "";
+}
+
+// decryption
 dBtn.onclick = function() {
-	const encrypted = input.value;
+	const encrypted = inputDe.value;
 	if(!encrypted) return;
 	delTable();
 	const decrypted = caesarDecrypt(encrypted);
 	shiftField.value = decrypted[0];
-	output.value = decrypted[1];
+	outputDe.value = decrypted[1];
 	buildTable( decrypted[2] );
 }
 
-cBtn.onclick = function() {
-	output.value = "";
-	input.value = "";
+dcBtn.onclick = function() {
+	outputDe.value = "";
+	inputDe.value = "";
 	shiftField.value = "";
 	delTable();
 }
