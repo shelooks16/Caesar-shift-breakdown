@@ -20,11 +20,12 @@ const LITHUANIAN = [
   5.29, 10.25, 6.75, 5.86, 2.84, 1.09
 ];
 
-const decrypt = (str, key) => {
+const decrypt = (str, key, encrypt=0) => {
   // key must be used to decrypt:
   // key %= 26;
   // key that was used to encrypt: 
-  key = 26-key
+  // key = 26-key
+  encrypt===0? key=26-key : key=((key-26)%26)+26;
   return str
     .toUpperCase()
     .replace(/[A-Z]/g, ch => String.fromCharCode( (ch.charCodeAt(0)+key -65)%26 +65) );
@@ -43,11 +44,11 @@ const chiSquared = dString => {
       // how many times we expect char to appear,
       // using alphabet letter frequency
       const expected = dLength * ENGLISH[ ch.charCodeAt(0) -65 ] /100;
-      const chiSquaredChar = (observed - expected)**2 / expected; 
+      const chiSquaredChar = (observed - expected)**2 / expected;
       chiSquaredString += chiSquaredChar;
     }
   }
-  return chiSquaredString;
+  return Math.sqrt(chiSquaredString);
 };
 
 // Complete table for all 26 shifts

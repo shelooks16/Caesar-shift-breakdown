@@ -7,15 +7,31 @@
  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
 </head>
 <body>
+	
+	<div class="mainFrame">
+		<h1>Encryption</h1>
+  <textarea cols="33" rows="10" placeholder="Insert plain text here"></textarea>
+  <div class="mainFrame__btns">
+   <button>Encrypt</button>
+   <div class="key" style="margin: 10px 0">
+   	<span>Key: </span><input type="text" id="shiftInput" onkeypress="validate(event)">
+   </div>
+   <button>Clear fields</button>
+  </div>
+  <textarea cols="33" rows="10" placeholder="Encrypted text will be here" readonly></textarea>
+	</div>
+
+	<br>
  <div class="mainFrame">
-  <textarea cols="33" rows="10" placeholder="Insert your text here"></textarea>
+ 	<h1>Decryption</h1>
+  <textarea cols="33" rows="10" placeholder="Insert encrypted text here"></textarea>
   <div class="mainFrame__btns">
    <button>Decrypt</button>
    <button>Clear fields</button>
   </div>
   <textarea cols="33" rows="10" placeholder="Here will be the result" readonly></textarea>
-  <p>To encrypt this text was used next key:</p>
-  <input type="text" id="shift" readonly> 
+  <p>Key that was used: </p>
+  <input type="text" id="shiftOutput" readonly> 
  </div>
  <div id='tablePlace'></div>
 <script src="caesarBreakdown.js"></script>
