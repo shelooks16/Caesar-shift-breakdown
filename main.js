@@ -1,6 +1,6 @@
 const [inputEn, outputEn, inputDe, outputDe] = document.querySelectorAll('textarea');
 const [eBtn, ecBtn, dBtn, dcBtn] = document.querySelectorAll('button');
-const [keyInput, shiftField] = document.querySelectorAll('input');
+const [keyInput, shiftField, langField] = document.querySelectorAll('input');
 
 const delTable = ()=>{
 	if( document.querySelector('table') ) {
@@ -22,7 +22,7 @@ eBtn.onclick = function() {
 	const plainText = inputEn.value;
 	const key = keyInput.value;
 	if(!plainText || !key) return;
-	const encryptedText = decrypt( plainText, key, 1 );
+	const encryptedText = caesarShift( plainText, key, 1 );
 	outputEn.value = encryptedText;
 }
 
@@ -37,16 +37,18 @@ dBtn.onclick = function() {
 	const encrypted = inputDe.value;
 	if(!encrypted) return;
 	delTable();
-	const decrypted = caesarDecrypt(encrypted);
+	const decrypted = decryptText(encrypted);
 	shiftField.value = decrypted[0];
 	outputDe.value = decrypted[1];
-	buildTable( decrypted[2] );
+	langField.value = decrypted[2];
+	buildTable( decrypted[3] );
 }
 
 dcBtn.onclick = function() {
 	outputDe.value = "";
 	inputDe.value = "";
 	shiftField.value = "";
+	langField.value = "";
 	delTable();
 }
 

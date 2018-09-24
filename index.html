@@ -30,8 +30,12 @@
    <button>Clear fields</button>
   </div>
   <textarea cols="33" rows="10" placeholder="Here will be the result" readonly></textarea>
-  <p>Key that was used: </p>
-  <input type="text" id="shiftOutput" readonly> 
+  <div class="mainFrame__out">
+    <span>Key that was used: </span>
+    <input type="text" id="shiftOutput" readonly> 
+    <span>Detected language: </span>
+    <input type="text" id="langOutput" readonly> 
+  </div>
  </div>
  <div id='tablePlace'></div>
 <script src="caesarBreakdown.js"></script>
