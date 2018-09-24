@@ -41,7 +41,7 @@ dBtn.onclick = function() {
 	shiftField.value = decrypted[0];
 	outputDe.value = decrypted[1];
 	langField.value = decrypted[2];
-	buildTable( decrypted[3] );
+	buildTable( decrypted[0], decrypted[3] );
 }
 
 dcBtn.onclick = function() {
@@ -52,7 +52,7 @@ dcBtn.onclick = function() {
 	delTable();
 }
 
-const buildTable = chiTable => {
+const buildTable = (shiftUsed, chiTable) => {
 	const tablePlace = document.getElementById("tablePlace");
 	const table = document.createElement('table'),
 	 tbody = document.createElement('tbody');
@@ -78,6 +78,9 @@ const buildTable = chiTable => {
 	 content.append(document.createTextNode(chiTable[shift].toFixed(2)));
 	 row.appendChild(content);
 
+	 if(shift === shiftUsed) {
+	 	row.style.background = '#ddd';
+	 }
 	 tbody.appendChild(row);
 	}
 };
