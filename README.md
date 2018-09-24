@@ -6,4 +6,4 @@
 
 <a href='https://en.wikipedia.org/wiki/Chi-squared_test' target='_blank'>Wikipedia reference</a>
 
-`Since it deciphers with statistics one/two words may not be decrypted correctly`
+`Since it deciphers with statistics string with length of one/two words may not be decrypted correctly`
