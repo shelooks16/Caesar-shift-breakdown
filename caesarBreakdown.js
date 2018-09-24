@@ -1,49 +1,58 @@
-// Approximate distribution of letters [%]
-const GERMAN = [
-  6.51, 1.89, 3.06, 5.08, 17.4, 1.66, 3.01,
-  4.76, 7.55, 0.27, 1.21, 3.44, 2.53,
-  9.78, 2.51, 0.79, 0.02, 7, 7.27, 6.15,
-  4.35, 0.67, 1.89, 0.03, 0.04, 1.13
-];
+// Approximate distribution of letters [%] !LENGTH=26!
+const DISTRIBUTION = {
+  'eng': [
+    8.2, 1.5, 2.8, 4.3, 12.7, 2.2,
+    2, 6.1, 7, 0.2, 0.8, 4, 2.4,
+    6.7, 7.5, 1.9, 0.1, 6, 6.3,
+    9.1, 2.8,1, 2.4, 0.2, 2, 0.1
+  ],
+  'ger': [
+    6.51, 1.89, 3.06, 5.08, 17.4, 1.66, 3.01,
+    4.76, 7.55, 0.27, 1.21, 3.44, 2.53,
+    9.78, 2.51, 0.79, 0.02, 7, 7.27, 6.15,
+    4.35, 0.67, 1.89, 0.03, 0.04, 1.13 
+  ], 
+  'lt': [
+    11.48, 1.56, 0.66, 1.65, 7.71,
+    0.05, 2.34, 1.51, 16.14, 1.78,
+    4.41, 2.7, 4.04, 4.7, 5.12, 2.05,
+    0.0008, 5.29, 10.25, 6.75, 5.86,
+    2.84, 0.0052, 0.0170, 1.55, 1.09 
+  ],
+  // 'fr': [
+  //   7.636, 0.901, 3.260, 3.669, 14.715,
+  //   1.066, 0.866, 0.737, 7.529, 0.613,
+  //   0.049, 5.456, 2.968, 7.095, 5.796,
+  //   2.521, 1.362, 6.693, 7.948, 7.244,
+  //   6.311, 1.838, 0.074, 0.427, 0.128, 0.326
+  // ],
+};
 
-const ENGLISH = [
-  8.2, 1.5, 2.8, 4.3, 12.7, 2.2,
-  2, 6.1, 7, 0.2, 0.8, 4, 2.4,
-  6.7, 7.5, 1.9, 0.1, 6, 6.3,
-  9.1, 2.8,1, 2.4, 0.2, 2, 0.1
-];
-
-const LITHUANIAN = [
-  11.48, 1.56, 0.66, 1.65, 7.71,
-  0.05, 2.34, 16.14, 1.55, 1.78,
-  4.41, 2.7, 4.04, 4.7, 5.12, 2.05,
-  5.29, 10.25, 6.75, 5.86, 2.84, 1.09
-];
-
-const decrypt = (str, key, encrypt=0) => {
+const caesarShift = (str, key, encrypt=0) => {
   // key must be used to decrypt:
-  // key %= 26;
+  // key=((key-26)%26)+26;
   // key that was used to encrypt: 
   // key = 26-key
-  encrypt===0? key=26-key : key=((key-26)%26)+26;
+  encrypt ? key=((key-26)%26)+26 : key=26-key;
   return str
     .toUpperCase()
     .replace(/[A-Z]/g, ch => String.fromCharCode( (ch.charCodeAt(0)+key -65)%26 +65) );
 }
 
-// Chi-squared Statistic
-const chiSquared = dString => {
+// returns chi-squared test result for a string
+// dString - decrypted text ""
+// charsFrequencyTable - characters frequencies of the string []
+// lang - language to be used during calculation of statistics ""
+const chiSquaredTest = (dString, charsFrequencyTable, lang='eng') => {
   const dLength = dString.length;
-  const frequencyTable = getFrequency(dString);
   let chiSquaredString = 0;
-
   for(const ch of dString) {
     if( ch.match(/[A-Z]/) ) {
-      // how many times char appears
-      const observed = frequencyTable[ch];
+      // how many times char actually appears
+      const observed = charsFrequencyTable[ch];
       // how many times we expect char to appear,
-      // using alphabet letter frequency
-      const expected = dLength * ENGLISH[ ch.charCodeAt(0) -65 ] /100;
+      // consider letter distribution frequencies
+      const expected = dLength * DISTRIBUTION[lang][ch.charCodeAt(0)-65] /100;
       const chiSquaredChar = (observed - expected)**2 / expected;
       chiSquaredString += chiSquaredChar;
     }
@@ -51,31 +60,44 @@ const chiSquared = dString => {
   return Math.sqrt(chiSquaredString);
 };
 
-// Complete table for all 26 shifts
+// returns possible language and
+// result of statistical test for all 26 shifts as []
 const getChiStats = encryptedStr => {
-  let chiSquaredTable = [];
+  let table = {};
   for(let i=0; i<26; i++) {
-    const decryptedStr = decrypt(encryptedStr, i);
-    chiSquaredTable.push( chiSquared(decryptedStr) );
+    const decryptedStr = caesarShift(encryptedStr, i);
+    const letterFrequencies = getFrequency(decryptedStr);
+    for(const lang of Object.keys(DISTRIBUTION)) {
+      const chiString = chiSquaredTest(decryptedStr, letterFrequencies, lang);
+      !table[lang] ? table[lang] = [chiString] :
+        table[lang].push(chiString);
+    }
   }
-  return chiSquaredTable;
+  // find min value among all results of stats
+  const min = Object.values(table)
+    .map(val=> val.reduce((prev,cur)=>prev<cur?prev:cur))
+    .reduce((prev,cur)=>prev<cur?prev:cur);
+  // find language[key] by min[value]
+  const language = Object.keys(table).find(key => table[key].includes(min));
+  return [language, table[language]];
 }
 
+// returns frequencies of string characters as {}
 const getFrequency = str => {
   let frequency = {};
   for(const ch of str) {
-    if( isNaN(frequency[ch]) && ch.match(/[A-Z]/g) ) {
-      frequency[ch] = 1;
-    } else if( ch.match(/[A-Z]/g) ) {
-      frequency[ch]++;
+    if( ch.match(/[A-Z]/) ) {
+      frequency[ch] = ++frequency[ch] || 1;
     }
   }
   return frequency;
 }
 
-const caesarDecrypt = iString => {
-  const chiTable = getChiStats( iString );
-  const shift = Object.keys(chiTable).reduce((prev, cur)=>chiTable[prev]<chiTable[cur]?prev:cur);
-  const result = [shift, decrypt( iString, shift ), chiTable];
+const decryptText = iString => {
+  const [language, chiTable] = getChiStats( iString );
+  const shift = chiTable.indexOf( chiTable.reduce((prev, cur)=>prev<cur?prev:cur) );
+  const result = [shift, caesarShift(iString, shift), language, chiTable];
   return result;
 };
+
+// console.log( decryptText('YHAFCMB QUM ZCLMN MJIEYH CH YULFS GYXCYPUF YHAFUHX') );
