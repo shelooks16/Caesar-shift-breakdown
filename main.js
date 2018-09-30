@@ -22,7 +22,7 @@ eBtn.onclick = function() {
 	const plainText = inputEn.value;
 	const key = keyInput.value;
 	if(!plainText || !key) return;
-	const encryptedText = caesarShift( plainText, key, 1 );
+	const encryptedText = caesarCipher.makeShift( plainText, key, 1 );
 	outputEn.value = encryptedText;
 }
 
@@ -37,7 +37,7 @@ dBtn.onclick = function() {
 	const encrypted = inputDe.value;
 	if(!encrypted) return;
 	delTable();
-	const decrypted = decryptText(encrypted);
+	const decrypted = caesarCipher.decrypt(encrypted);
 	shiftField.value = decrypted[0];
 	outputDe.value = decrypted[1];
 	langField.value = decrypted[2];
