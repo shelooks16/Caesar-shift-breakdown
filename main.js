@@ -2,49 +2,49 @@ const [inputEn, outputEn, inputDe, outputDe] = document.querySelectorAll('textar
 const [eBtn, ecBtn, dBtn, dcBtn] = document.querySelectorAll('button');
 const [keyInput, shiftField, langField] = document.querySelectorAll('input');
 
-const delTable = ()=>{
-	if( document.querySelector('table') ) {
-	 document.querySelector('table').remove();
+const delTable = () => {
+	if (document.querySelector('table')) {
+		document.querySelector('table').remove();
 	}
 };
 
 const validate = ev => {
 	const event = ev || window.event;
-	let key = String.fromCharCode( event.which );
-  if( !key.match(/[0-9\-\b]/) ) {
-    event.returnValue = false;
-    if(event.preventDefault) event.preventDefault();
-  }
+	let key = String.fromCharCode(event.which);
+	if (!key.match(/[0-9\-\b]/)) {
+		event.returnValue = false;
+		if (event.preventDefault) event.preventDefault();
+	}
 }
 
 // encryption
-eBtn.onclick = function() {
+eBtn.onclick = () => {
 	const plainText = inputEn.value;
 	const key = keyInput.value;
-	if(!plainText || !key) return;
-	const encryptedText = caesarCipher.makeShift( plainText, key, 1 );
+	if (!plainText || !key) return;
+	const encryptedText = caesarCipher.makeShift(plainText, key, 1);
 	outputEn.value = encryptedText;
 }
 
-ecBtn.onclick = function() {
+ecBtn.onclick = () => {
 	outputEn.value = "";
 	inputEn.value = "";
 	keyInput.value = "";
 }
 
 // decryption
-dBtn.onclick = function() {
+dBtn.onclick = () => {
 	const encrypted = inputDe.value;
-	if(!encrypted) return;
+	if (!encrypted) return;
 	delTable();
-	const decrypted = caesarCipher.decrypt(encrypted);
-	shiftField.value = decrypted[0];
-	outputDe.value = decrypted[1];
-	langField.value = decrypted[2];
-	buildTable( decrypted[0], decrypted[3] );
+	const { shift, decrypted, possibleLanguage: lang, chiSquareResults } = caesarCipher.decrypt(encrypted);
+	shiftField.value = shift;
+	outputDe.value = decrypted;
+	langField.value = lang;
+	buildTable(shift, chiSquareResults);
 }
 
-dcBtn.onclick = function() {
+dcBtn.onclick = () => {
 	outputDe.value = "";
 	inputDe.value = "";
 	shiftField.value = "";
@@ -54,12 +54,12 @@ dcBtn.onclick = function() {
 
 const buildTable = (shiftUsed, chiTable) => {
 	const tablePlace = document.getElementById("tablePlace");
-	const table = document.createElement('table'),
-	 tbody = document.createElement('tbody');
+	const table = document.createElement('table');
+	const tbody = document.createElement('tbody');
 
-	let tr = document.createElement('tr'),
-	 shiftRow = document.createElement('th'),
-	 chiRow = document.createElement('th');
+	let tr = document.createElement('tr');
+	let shiftRow = document.createElement('th');
+	let chiRow = document.createElement('th');
 	shiftRow.appendChild(document.createTextNode('Shift'));
 	chiRow.appendChild(document.createTextNode('Chi-Square Statistic (lower better)'));
 	tr.appendChild(shiftRow);
@@ -68,19 +68,19 @@ const buildTable = (shiftUsed, chiTable) => {
 	table.appendChild(tbody);
 	tablePlace.appendChild(table);
 
-	for(let shift=0; shift<26; shift++) {
-	 const row = document.createElement('tr');
+	chiTable.forEach((chiString, shift) => {
+		const row = document.createElement('tr');
+		let content = document.createElement('td');
+		content.append(document.createTextNode(shift));
+		row.appendChild(content);
+		content = document.createElement('td');
+		content.append(document.createTextNode(chiString.toFixed(2)));
+		row.appendChild(content);
 
-	 let content = document.createElement('td');
-	 content.append(document.createTextNode(shift));
-	 row.appendChild(content);
-	 content = document.createElement('td');
-	 content.append(document.createTextNode(chiTable[shift].toFixed(2)));
-	 row.appendChild(content);
+		if (shift === shiftUsed) {
+			row.style.background = '#ddd';
+		}
+		tbody.appendChild(row);
 
-	 if(shift === shiftUsed) {
-	 	row.style.background = '#ddd';
-	 }
-	 tbody.appendChild(row);
-	}
+	});
 };
